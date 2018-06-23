@@ -2,7 +2,6 @@
 #include "../lib/catch.hpp"
 
 #include <algorithm>
-#include <iostream>  // TODO: remove
 #include <map>
 #include <set>
 #include <string>
@@ -123,6 +122,7 @@ TEST_CASE("allMatch & anyMatch") {
 
 TEST_CASE("findFirst") {
   auto vec = mapVecToPtrs(vector<int>{1, 2, 3, 7, 6, 5, 4});
+  REQUIRE(Stream<int>::of(vec).findFirst([](int const* n) { return *n > 42; }) == nullptr);
   REQUIRE(*Stream<int>::of(vec).findFirst([](int const* n) { return *n < 2; }) == 1);
   REQUIRE(*Stream<int>::of(vec).findFirst([](int const* n) { return *n > 1; }) == 2);
   REQUIRE(*Stream<int>::of(vec).findFirst([](int const* n) { return *n > 4; }) == 7);
@@ -135,6 +135,7 @@ TEST_CASE("integration") {
               .filter([](int const* n) { return *n <= 4; })  // 1, 2, 3, 4, 2, 1
               .distinct()                                    // 1, 2, 3, 4
               .count() == 4);
+
   auto vec2 = mapVecToPtrs(vector<string>{"Michael Scott", "Dwight Schrute", "Pam Beasley"});
   REQUIRE(derefVec(
               Stream<string>::of(vec2)
@@ -142,6 +143,7 @@ TEST_CASE("integration") {
                   .map<int>([](int const* num) { return new int(*num % 2); })        // 1, 0, 1
                   .sorted()                                                          // 0, 1, 1
                   .collect<vector<int*>>()) == vector<int>{0, 1, 1});
+
   auto vec3 = mapVecToPtrs(vector<string>{"Bears", "Beets", "Battlestar Galactica"});
   REQUIRE(derefVec(
               Stream<string>::of(vec3)
@@ -149,4 +151,17 @@ TEST_CASE("integration") {
                   .map<char>([](string const* str) { return new char(str->at(str->size() - 1)); })             // 'a', 's', 's'
                   .distinct()                                                                                  // 'a', 's'
                   .collect<vector<char*>>()) == vector<char>{'a', 's'});
+
+  map<char, unsigned*> histo;
+  auto vec4 = mapVecToPtrs(vector<char>{'h', 'e', 'l', 'l', 'o'});
+  Stream<char>::of(vec4).forEach([&histo](char const* c) {
+    auto it = histo.find(*c);
+    if (it != histo.end()) {
+      *it->second = *it->second + 1;
+    } else {
+      histo.insert(std::pair<char, unsigned*>(*c, new unsigned(1)));
+    }
+  });
+  auto values = derefVec(Stream<unsigned>::of(histo).sorted().collect<vector<unsigned*>>());
+  REQUIRE(values == vector<unsigned>{1, 1, 1, 2});
 }
