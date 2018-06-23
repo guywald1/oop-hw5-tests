@@ -10,7 +10,7 @@ NUM_RANGE = [-10, 10]
 # range of rows/column
 ROW_COL_RANGE = [1, 10]
 # name of template that gets a value from a matrix (template<typename R, typename C, typename M>)
-MATRIX_GET_NAME = "_MatrixGet"
+MATRIX_GET_NAME = "MatrixGet"
 
 def matmul(a, b):
     zip_b = zip(*b)
