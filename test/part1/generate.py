@@ -2,7 +2,8 @@
 
 import random
 
-# ** configuration ** #j
+# ***** configuration ***** #
+
 # number of tests to run
 NUM_TESTS = 10
 # range of values in matrix
@@ -11,6 +12,8 @@ NUM_RANGE = [-10, 10]
 ROW_COL_RANGE = [1, 10]
 # name of template that gets a value from a matrix (template<typename R, typename C, typename M>)
 MATRIX_GET_NAME = "MatrixGet"
+
+# ***** helpers ***** #
 
 def matmul(a, b):
     zip_b = zip(*b)
@@ -45,6 +48,8 @@ def assertMultiply(mult, state):
     for r in range(0, len(mult)):
         for c in range(0, len(mult[0])):
             print("static_assert({0}<{1}, {2}, {3}>::value::value == {0}<{1}, {2}, {4}>::value::value, \"Failed: index {1},{2} should be equal to {5}.\");".format(MATRIX_GET_NAME, r, c, actualUuid, expectedUuid, mult[r][c]))
+
+# ***** main ***** #
 
 def main():
     state = { "count": 0}
